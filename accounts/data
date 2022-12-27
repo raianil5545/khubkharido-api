@@ -1,0 +1,20 @@
+{
+    "first_name": "seller",
+    "last_name": "something",
+    "email":"seller1@gmail.com",
+    "password": "Seller1@",
+    "role": "seller"
+}
+{
+"email": "seller1@gmail.com",
+"password" : "Seller1@"
+}
+
+{
+"name" : "cap",
+"description": "hello",
+"price": 10,
+"in_stock" : 2,
+"brands": ["no", "brand"],
+"categories": ["winter", "clothing"]
+}
