@@ -32,8 +32,5 @@ class Product(models.Model):
     images = models.ImageField(upload_to=upload_path)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date Published")
 
-    @property
-    def user_email(self):
-        return self.user.email
 
 
