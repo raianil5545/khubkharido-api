@@ -16,7 +16,7 @@ class OrderCreateListView(views.APIView):
 
     def post(self, request):
         data = request.data
-        product_id = data.pop("product_id")
+        product_id = data["product_id"]
         product = Product.objects.get(id=product_id)
         if not product:
             exceptions.NotFound("Item not found")

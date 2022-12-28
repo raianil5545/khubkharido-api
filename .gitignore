@@ -1,0 +1,4 @@
+product_images
+.coverage
+.pytest_cache
+tests/api/product_images

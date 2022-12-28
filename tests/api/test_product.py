@@ -1,6 +1,8 @@
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from product import models
+from PIL import Image
+import tempfile
 
 
 @pytest.mark.django_db
@@ -95,44 +97,41 @@ def test_get_product_404(auth_client):
     response = auth_client.get('/api/product/0/')
     assert response.status_code == 404
 
-# @pytest.mark.django_db
-# def test_update_product_by_id(auth_client, user_seller):
-#     small_gif = (
-#         b'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x00\x00\x00\x21\xf9\x04'
-#         b'\x01\x0a\x00\x01\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02'
-#         b'\x02\x4c\x01\x00\x3b'
-#     )
-#     uploaded = SimpleUploadedFile('small.gif', small_gif, content_type='image/gif')
-#     payload = dict(
-#         name="some name",
-#         description="some description",
-#         price=200,
-#         in_stock=10,
-#         brands=["test", "no brands"],
-#         categories=["winter", "wear"],
-#         images=uploaded)
-#     product = models.Product.objects.create(user_id=user_seller.id, **payload)
-#     small_gif2 = (
-#         b'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x20\x00\x00\x00\x21\xf9\x04'
-#         b'\x01\x0a\x00\x01\x02\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02'
-#         b'\x02\x4c\x01\x02\x3b'
-#     )
-#     uploaded2 = SimpleUploadedFile('small2.gif', small_gif2, content_type='image/gif')
-#     payload2 = dict(
-#         name="some other name",
-#         description="some other description",
-#         price=20,
-#         in_stock=10,
-#         brands=["test", "rest"],
-#         categories=["winter", "wear"],
-#         images=uploaded2
-#     )
-#     response = auth_client.put(f"/api/product/{product.id}/", payload2)
-#     print(response.status_code)
-#     product.refresh_from_db()
-#     assert response.status_code == 200
-#     data = response.data
-#     assert data["id"] == product.id
+@pytest.mark.django_db
+def test_update_product_by_id(auth_client, user_seller):
+    small_gif = (
+        b'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x00\x00\x00\x21\xf9\x04'
+        b'\x01\x0a\x00\x01\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02'
+        b'\x02\x4c\x01\x00\x3b'
+    )
+    uploaded = SimpleUploadedFile('small.gif', small_gif, content_type='image/gif')
+    payload = dict(
+        name="some name",
+        description="some description",
+        price=200,
+        in_stock=10,
+        brands=["test", "no brands"],
+        categories=["winter", "wear"],
+        images=uploaded)
+    product = models.Product.objects.create(user_id=user_seller.id, **payload)
+    image = Image.new('RGBA', size=(50, 50), color=(155, 0, 0))
+    file = tempfile.NamedTemporaryFile(suffix='.png')
+    image.save(file)
+    with open(file.name, 'rb') as data:
+        payload2 = dict(
+            name="some other name",
+            description="some other description",
+            price=20,
+            in_stock=10,
+            brands=["test", "rest"],
+            categories=["winter", "wear"],
+            images=data
+        )
+        response = auth_client.put(f"/api/product/{product.id}/", payload2,  format='multipart')
+    product.refresh_from_db()
+    assert response.status_code == 200
+    data = response.data
+    assert data["id"] == product.id
 
 
 @pytest.mark.django_db
